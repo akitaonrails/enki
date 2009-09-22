@@ -3,4 +3,5 @@ log
 tmp/**/*
 tmp
 config/database.yml
+config/enki.yml
 db/schema.rb
