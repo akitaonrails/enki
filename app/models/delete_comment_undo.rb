@@ -4,7 +4,7 @@ class DeleteCommentUndo < UndoItem
 
     comment = nil
     transaction do
-      comment = Comment.create(loaded_data)
+      comment = Comment.create!(loaded_data)
       raise UndoFailed if comment.new_record?
       self.destroy
     end

@@ -4,8 +4,8 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe Post, "integration" do
   describe 'setting tag_list' do
     it 'increments tag counter cache' do
-      post1 = Post.create!(:title => 'My Post', :body => "body", :tag_list => "ruby")
-      post2 = Post.create!(:title => 'My Post', :body => "body", :tag_list => "ruby")
+      post1 = Factory.create(:post, :tag_list => "ruby")
+      post2 = Factory.create(:post, :tag_list => "ruby")
       Tag.find_by_name('ruby').taggings_count.should == 2
       post2.destroy
       Tag.find_by_name('ruby').taggings_count.should == 1
@@ -15,37 +15,38 @@ end
 
 describe Post, ".find_recent" do
   it 'finds the most recent posts that were published before now' do
-    now = Time.now
-    Time.stub!(:now).and_return(now)
-    Post.should_receive(:find).with(:all, {
-      :order      => 'posts.published_at DESC',
-      :conditions => ['published_at < ?', now],
-      :limit      => Post::DEFAULT_LIMIT
-    })
-    Post.find_recent
+    Factory.create(:post, :published_at => Time.now + 1.hour) # in the future
+    2.times { Factory.create(:post, :published_at => 1.week.ago) }
+    Post.find_recent.should have(2).things
   end
 
   it 'finds the most recent posts that were published before now with a tag' do
-    now = Time.now
-    Time.stub!(:now).and_return(now)
-    Post.should_receive(:find_tagged_with).with('code', {
-      :order      => 'posts.published_at DESC',
-      :conditions => ['published_at < ?', now],
-      :limit      => Post::DEFAULT_LIMIT
-    })
-    Post.find_recent(:tag => 'code')
+    Factory.create(:post, :published_at => Time.now + 1.hour) # in the future
+    2.times { Factory.create(:post, :published_at => 1.week.ago) } # in the past without tag
+    2.times { Factory.create(:post, :published_at => 1.week.ago, :tag_list => "code") }
+    Post.find_recent(:tag => 'code').should have(2).things
   end
 
   it 'finds all posts grouped by month' do
-    now = Time.now
-    Time.stub!(:now).and_return(now)
-    posts = [1, 1, 2].collect {|month| mock_model(Post, :month => month) }
-    Post.should_receive(:find).with(:all, {
-      :order      => 'posts.published_at DESC',
-      :conditions => ['published_at < ?', now]
-    }).and_return(posts)
-    months = Post.find_all_grouped_by_month.collect {|month| [month.date, month.posts]}
-    months.should == [[1, [posts[0], posts[1]]], [2, [posts[2]]]]
+    days = [1,2,3] # consecutive days, the order is important in the comparison later
+    posts = [1,1,2].map do |month|
+      Factory.create(:post, :published_at => Time.utc(2009,month,days.shift))
+    end
+    
+    months = Post.find_all_grouped_by_month.collect {|month| [month.date.month, month.posts]}
+    months.should == [[1, [posts[1], posts[0]]], [2, [posts[2]]]]
+  end
+  
+  it "find by permalink using several examples" do
+    post = Factory.create(:post, :published_at => Time.utc(2009,9,4))
+    Post.find_by_permalink(2009,9,4,'foo').should == post
+    lambda { 
+      Post.find_by_permalink(2009,9,3,'foo') 
+    }.should raise_error(ActiveRecord::RecordNotFound)
+    # ArgumentError =>
+    lambda { 
+      Post.find_by_permalink(2009,40,50,'foo') 
+    }.should raise_error(ActiveRecord::RecordNotFound)
   end
 end
 

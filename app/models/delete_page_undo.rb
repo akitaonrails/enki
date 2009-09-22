@@ -1,10 +1,11 @@
 class DeletePageUndo < UndoItem
   def process!
-    raise('Page already exists') if Page.find_by_id(loaded_data.delete('id').to_i)
+    raise(UndoFailed) if Page.find_by_id(loaded_data.delete('id').to_i)
 
     page = nil
     transaction do
       page = Page.create!(loaded_data)
+      raise UndoFailed if page.new_record?
       self.destroy
     end
     page

@@ -110,6 +110,15 @@ describe Admin::PostsController do
       session[:logged_in] = true
       lambda { post :create, :post => valid_post_attributes }.should change(Post, :count).by(1)
     end
+    
+    it "should not create an invalid post" do
+      session[:logged_in] = true
+      Post.stub!(:new).and_return(mock_model(Post, :save => false))
+      lambda { 
+        post :create, :post => valid_post_attributes
+      }.should change(Post, :count).by(0)
+      response.should render_template("new")
+    end
   end
 
   def valid_post_attributes

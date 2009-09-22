@@ -9,7 +9,7 @@ describe DeleteCommentUndo do
       item.stub!(:transaction).and_yield
       item.stub!(:destroy)
 
-      Comment.should_receive(:create).with('a' => 'b').and_return(mock("comment", :new_record? => false))
+      Comment.should_receive(:create!).with('a' => 'b').and_return(mock("comment", :new_record? => false))
       item.process!
     end
   end
@@ -25,7 +25,7 @@ describe DeleteCommentUndo do
     it 'raises' do
       Comment.stub!(:find_by_id).and_return(nil)
 
-      Comment.stub!(:create).and_return(mock("comment", :new_record? => true))
+      Comment.stub!(:create!).and_return(mock("comment", :new_record? => true))
       lambda { DeleteCommentUndo.new(:data => "---\nid: 1").process! }.should raise_error(UndoFailed)
     end
   end

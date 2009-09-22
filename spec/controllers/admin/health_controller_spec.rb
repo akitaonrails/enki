@@ -19,9 +19,9 @@ describe Admin::HealthController do
   describe 'handling POST to exception' do
     describe 'when logged in' do
       it 'raises a RuntimeError' do
-        session[:logged_in] = true
         lambda {
-          post :exception
+          session[:logged_in] = true
+          post :throw_exception
         }.should raise_error
       end
     end
@@ -29,7 +29,7 @@ describe Admin::HealthController do
     describe 'when not logged in' do
       it 'does no raise' do
         lambda {
-          post :exception
+          post :throw_exception
         }.should_not raise_error
       end
     end
@@ -38,7 +38,7 @@ describe Admin::HealthController do
   describe 'handling GET to exception' do
     it '405s' do
       session[:logged_in] = true
-      get :exception
+      get :throw_exception
       response.status.should == '405 Method Not Allowed'
       response.headers['Allow'].should == 'POST'
     end

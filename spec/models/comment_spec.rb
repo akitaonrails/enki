@@ -70,11 +70,15 @@ describe Comment do
   end
 
   it "responds to trusted_user? for defensio integration" do
-    @comment.respond_to?(:trusted_user?).should == true
+    lambda { @comment.trusted_user? }.should_not raise_error(NoMethodError)
   end
 
   it "responds to user_logged_in? for defensio integration" do
-    @comment.respond_to?(:user_logged_in?).should == true
+    lambda { @comment.user_logged_in? }.should_not raise_error(NoMethodError)
+  end
+  
+  it "responds to approved?" do
+    lambda { @comment.approved? }.should_not raise_error(NoMethodError)
   end
 
   it "delegates post_tile to post" do
@@ -98,19 +102,27 @@ describe Comment, '#blank_openid_fields_if_unused' do
 end
 
 describe Comment, '.find_recent' do
+  before :each do
+    @comments = Comment::DEFAULT_LIMIT.times.map do |i| 
+      Factory.create(:comment, :body => i.to_s)
+    end
+  end
+  
   it 'finds the most recent comments that were posted before now' do
-    now = Time.now
-    Time.stub!(:now).and_return(now)
-    Comment.should_receive(:find).with(:all, {
-      :order      => 'created_at DESC',
-      :limit      => Comment::DEFAULT_LIMIT
-    }).and_return(comments = [mock_model(Comment)])
-    Comment.find_recent.should == comments
+    Comment.find_recent.map(&:body).should == @comments.map(&:body).reverse
+  end
+  
+  it 'finds the most recent comments that were posted before now with conditions' do
+    5.times.map do |i| 
+      @comments[i].author = "jane doe"
+      @comments[i].save
+    end
+    Comment.count.should == Comment::DEFAULT_LIMIT
+    Comment.find_recent(:conditions => { :author => "jane doe" }).size.should == 5
   end
 
   it 'allows and override of the default limit' do
-    Comment.should_receive(:find).with(:all, hash_including(:limit => 999))
-    Comment.find_recent(:limit => 999)
+    Comment.find_recent(:limit => 2).size.should == 2
   end
 end
 

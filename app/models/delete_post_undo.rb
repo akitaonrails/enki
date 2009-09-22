@@ -1,11 +1,11 @@
 class DeletePostUndo < UndoItem
   def process!
-    post_attributes = loaded_data[:post]
-    raise('Post already exists') if Post.find_by_id(post_attributes.delete('id').to_i)
+    raise(UndoFailed) if Post.find_by_id(loaded_data[:post].delete('id').to_i)
 
     post = nil
     transaction do
-      post = Post.create!(post_attributes)
+      post = Post.create!(loaded_data[:post])
+      raise UndoFailed if post.new_record?
       loaded_data[:comments].each do |comment|
         post.comments.create!(comment.except('id'))
       end
@@ -19,11 +19,11 @@ class DeletePostUndo < UndoItem
   end
 
   def description
-    "Deleted post '#{loaded_data[:post]["title"]}'"
+    "Deleted post '#{loaded_data[:post].try(:[], "title")}'"
   end
 
   def complete_description
-    "Recreated post '#{loaded_data[:post]["title"]}'"
+    "Recreated post '#{loaded_data[:post].try(:[], "title")}'"
   end
 
   class << self

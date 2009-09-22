@@ -83,7 +83,7 @@ class Post < ActiveRecord::Base
         :conditions => ['published_at < ?', Time.now]
       )
       month = Struct.new(:date, :posts)
-      posts.group_by(&:month).inject([]) {|a, v| a << month.new(v[0], v[1])}
+      posts.group_by(&:month).sort_by{ |v| v[0] }.inject([]) {|a, v| a << month.new(v[0], v[1])}
     end
   end
 

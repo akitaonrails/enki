@@ -55,6 +55,34 @@ describe Admin::PagesController do
     it('assigns page for the view') { assigns[:page] == @page }
   end
 
+  describe 'handling POST to create with valid attributes' do
+    before(:each) do
+      @page = mock_model(Page, :title => 'A page')
+      Page.stub!(:new).and_return(@page)
+      session[:logged_in] = true
+    end
+
+    def do_post(return_value)
+      @page.stub!(:save).and_return(return_value)
+      post :create, :page => {
+        'title' => 'My Post',
+        'slug'  => 'my-post',
+        'body'  => 'This is my post'
+      }      
+    end
+
+    it 'redirects to show' do
+      do_post(true)
+      response.should be_redirect
+      response.should redirect_to(admin_page_path(@page))
+    end
+    
+    it "redirects to new if page is invalid" do
+      do_post(false)
+      response.should render_template('new')
+    end
+  end
+  
   describe 'handling PUT to update with valid attributes' do
     before(:each) do
       @page = mock_model(Page, :title => 'A page')
@@ -108,6 +136,53 @@ describe Admin::PagesController do
     it 'is unprocessable' do
       do_put
       response.status.should == '422 Unprocessable Entity'
+    end
+  end
+  
+  describe 'handling DELETE to destroy' do
+    before(:each) do
+      @page = Page.new
+      @page.stub!(:destroy_with_undo)
+      Page.stub!(:find).and_return(@page)
+    end
+
+    def do_delete
+      session[:logged_in] = true
+      delete :destroy, :id => 1
+    end
+
+    it("redirects to index") do
+      do_delete
+      response.should be_redirect
+      response.should redirect_to(admin_pages_path)
+    end
+
+    it("deletes page") do
+      @page.should_receive(:destroy_with_undo)
+      do_delete
+    end
+  end
+  
+  describe 'handling DELETE to destroy, JSON request' do
+    before(:each) do
+      @page = Page.new(:title => 'A page')
+      @page.stub!(:destroy_with_undo).and_return(mock("undo_item", :description => 'hello'))
+      Page.stub!(:find).and_return(@page)
+    end
+
+    def do_delete
+      session[:logged_in] = true
+      delete :destroy, :id => 1, :format => 'json'
+    end
+
+    it("deletes page") do
+      @page.should_receive(:destroy_with_undo).and_return(mock("undo_item", :description => 'hello'))
+      do_delete
+    end
+
+    it("renders page as json") do
+      do_delete
+      response.should have_text(/#{Regexp.escape(@page.to_json)}/)
     end
   end
 end
