@@ -1,5 +1,5 @@
 class Admin::CommentsController < Admin::BaseController
-  before_filter :find_comment, :only => [:show, :update, :destroy]
+  before_filter :find_comment, :except => [:index]
 
   def index
     @comments = Comment.paginate(
@@ -24,6 +24,16 @@ class Admin::CommentsController < Admin::BaseController
     else
       render :action => 'show'
     end
+  end
+  
+  def mark_as_ham
+    params[:comment] = { :akismet => 'ham' }
+    update
+  end
+  
+  def mark_as_spam
+    params[:comment] = { :akismet => 'spam' }
+    update
   end
 
   def destroy

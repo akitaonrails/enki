@@ -11,6 +11,8 @@
       <th>Commenter</th>
       <th>Excerpt</th>
       <th>Post</th>
+      <th>IP</th>
+      <th>Akismet</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -26,7 +28,7 @@
   <tfoot>
     <% if @comments.total_pages > 1 -%>
       <tr class="pagination">
-        <td colspan='5'>
+        <td colspan='7'>
           <%= will_paginate(@comments, :previous_label => '« Newer', :next_label => 'Older »') %>
         </td>  
       </tr>  

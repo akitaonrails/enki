@@ -1,5 +1,7 @@
 class CommentsController < ApplicationController
   include UrlHelper
+  has_rakismet
+  
   OPEN_ID_ERRORS = { 
     :missing  => "Sorry, the OpenID server couldn't be found", 
     :canceled => "OpenID verification was canceled",
@@ -52,6 +54,9 @@ class CommentsController < ApplicationController
     end
 
     if session[:pending_comment].nil? && @comment.save
+      if Enki::Config.default[:comment_start_as] == 'spam'
+        flash[:notice] = 'Your comment is awaiting for approval.'
+      end
       redirect_to post_path(@post)
     else
       render :template => 'posts/show'

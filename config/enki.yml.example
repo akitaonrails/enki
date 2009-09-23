@@ -8,9 +8,15 @@ author:
   open_id:                  # These are used to login to the admin area
       - http://enkiblog.com
       - http://secondaryopenid.com
+comment_start_as: ham
 
 # Delete the following section if your site will not be acting as an OpenID delegate (http://wiki.openid.net/Delegation)
 # If you're deploying with mongrel, make sure you read http://rhnh.net/2008/04/13/nginx-openid-delegation-and-yadis
 open_id_delegation:
   server:   http://www.myopenid.com/server
   delegate: http://username.myopenid.com
+
+# Configure your Wordpress Rakismet key and url. Register at wordpress.com
+rakismet:
+  key:
+  url:

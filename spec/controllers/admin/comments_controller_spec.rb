@@ -82,6 +82,23 @@ describe Admin::CommentsController do
       assigns(:comment).should == @comment
     end
   end
+  
+  describe 'handling PUT to invert akismet ham/spam status' do
+    before(:each) do
+      @comment = Factory.create(:comment)
+      session[:logged_in] = true
+    end
+    
+    it "should invert status" do
+      put :mark_as_spam, :id => @comment.to_param
+      @comment.reload
+      @comment.akismet.should == 'spam'
+      
+      put :mark_as_ham, :id => @comment.to_param
+      @comment.reload
+      @comment.akismet.should == 'ham'
+    end
+  end
 
   describe 'handling DELETE to destroy' do
     before(:each) do

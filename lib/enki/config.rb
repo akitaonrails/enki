@@ -17,7 +17,11 @@ module Enki
     end
 
     def self.default
-      Enki::Config.new(default_location)
+      @@config ||= Enki::Config.new(default_location)
+    end
+    
+    def self.reload
+      @@config = Enki::Config.new(default_location)
     end
 
     def self.default_location

@@ -1,11 +1,13 @@
 class Comment < ActiveRecord::Base
   DEFAULT_LIMIT = 15
+  has_rakismet :only => :create, :content => :body
 
   attr_accessor         :openid_error
   attr_accessor         :openid_valid
 
   belongs_to            :post
 
+  before_create         :default_status
   before_save           :apply_filter
   after_save            :denormalize
   after_destroy         :denormalize
@@ -17,9 +19,15 @@ class Comment < ActiveRecord::Base
     super 
     errors.add(:base, openid_error) unless openid_error.blank?
   end
+  
+  def default_status
+    self.akismet = Enki::Config.default[:comment_start_as] || 'ham'
+  end
 
   def apply_filter
     self.body_html = Lesstile.format_as_xhtml(self.body, :code_formatter => Lesstile::CodeRayFormatter)
+    self.author_email = "" unless self.author_email
+    self.author_url = "" unless self.author_url
   end
   
   def blank_openid_fields

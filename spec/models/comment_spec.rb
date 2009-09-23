@@ -87,6 +87,16 @@ describe Comment do
     @comment.post_title.should == "hello"
   end
 
+  it "should use the default comment status stated in enki.yml" do
+    Enki::Config.default.should_receive(:[]).with(:comment_start_as).and_return('ham')
+    @comment = Factory.create(:comment)
+    @comment.akismet.should == 'ham'
+
+    Enki::Config.default.should_receive(:[]).with(:comment_start_as).and_return('spam')
+    @comment = Factory.create(:comment)
+    @comment.akismet.should == 'spam'
+  end
+
   # TODO: acts_as_defensio_comment tests
   # TODO: OpenID error model
 end

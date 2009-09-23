@@ -5,4 +5,5 @@ tmp
 config/database.yml
 config/enki.yml
 db/schema.rb
+db/*.sqlite3
 coverage/
