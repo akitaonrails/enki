@@ -8,6 +8,7 @@ Factory.define(:comment) do |c|
   c.author_url ''
   c.author_email ''
   c.user_ip '127.0.0.1'
+  c.akismet 'ham'
   c.body 'this is a comment'
   c.association :post, :factory => :post 
 end

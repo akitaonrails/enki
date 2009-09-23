@@ -6,6 +6,9 @@
     <%= form.input :author_url, :required => false %>
     <%= form.input :author_email, :required => false %>
     <%= form.input :body, :hint => "<a href='http://lesstile.rubyforge.org'>Lesstile enabled</a>." %>
+		<%= form.input :referrer %>
+		<%= form.input :user_ip %>
+		<%= form.input :user_agent %>
   <% end %>
   <% form.button_field_set do -%>
     <%= form.commit_button("Save") %>

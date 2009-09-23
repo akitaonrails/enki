@@ -9,6 +9,7 @@ ActionController::Routing::Routes.draw do |map|
     admin.resources :comments, :member => {:mark_as_spam => :put, :mark_as_ham => :put}
     admin.resources :tags
     admin.resources :undo_items, :member => {:undo => :post}
+    admin.resources :uploads
   end
 
   map.admin_health '/admin/health/:action', :controller => 'admin/health', :action => 'index'

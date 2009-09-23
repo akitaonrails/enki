@@ -1,0 +1,24 @@
+<h1>Upload</h1>
+
+<p>
+  <strong>Avatar File Name:</strong>
+  <%=h @upload.avatar_file_name %>
+</p>
+<p>
+  <strong>Avatar Content Type:</strong>
+  <%=h @upload.avatar_content_type %>
+</p>
+<p>
+  <strong>Avatar File Size:</strong>
+  <%=h @upload.avatar_file_size %>
+</p>
+<p>
+  <strong>Avatar Updated At:</strong>
+  <%=h @upload.avatar_updated_at %>
+</p>
+
+<p>
+  <%= link_to "Edit", edit_admin_upload_path(@upload) %> |
+  <%= link_to "Destroy", [:admin, @upload], :confirm => 'Are you sure?', :method => :delete %> |
+  <%= link_to "View All", admin_uploads_path %>
+</p>

@@ -1,0 +1,9 @@
+<div id="upload_box">
+  <h3>Uploads</h3>
+  <% if uploads -%>
+    <% uploads.each_with_index do |upload, index| -%>
+      <%= link_to image_tag( upload.avatar.url(:tiny, false), :class => "upload_thumbnail" ),  upload.avatar.url(:original, false)	%>
+      <%= "<br/>" if (index + 1) % 5 == 0 %>
+    <% end -%>
+  <% end -%>
+</div>

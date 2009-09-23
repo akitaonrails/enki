@@ -1,3 +1,4 @@
+.DS_Store
 log/**/*
 log
 tmp/**/*
@@ -7,3 +8,5 @@ config/enki.yml
 db/schema.rb
 db/*.sqlite3
 coverage/
+public/assets/**/*
+public/assets

@@ -1,6 +1,7 @@
 class Admin::PagesController < Admin::BaseController
   before_filter :find_page, :only => [:show, :update, :destroy]
-
+  before_filter :load_uploads, :only => [:new]
+  
   def index
     respond_to do |format|
       format.html {

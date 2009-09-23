@@ -1,0 +1,24 @@
+<h1>Uploads</h1>
+
+<% form_for [:admin, @upload], :html => { :multipart => true } do |form| %>
+	<%= form.label :avatar, 'Choose file to upload:' %>
+  <%= form.file_field :avatar %>
+  <%= form.submit "Submit" %>
+<% end %>
+
+<div style="clear:both"/>
+
+<% for upload in @uploads -%>
+	<% div_for(upload, :style => "float: left; margin: 5px") do -%>
+	<%= link_to image_tag( upload.avatar.url(:thumb), :style => "border: 0px; width: 120px; height:120px" ),  upload.avatar.url(), :target => "_blank"	%><br/>
+	<%= link_to "Destroy", admin_upload_path(upload), :confirm => 'Are you sure?', :method => :delete %>
+	<% end -%>
+<% end -%>
+
+<div style="clear:both"/>
+
+<% if @uploads.total_pages > 1 -%>
+	<div class="pagination2">
+    <%= will_paginate(@uploads, :previous_label => '« Newer', :next_label => 'Older »') %>		
+	</div>
+<% end -%>

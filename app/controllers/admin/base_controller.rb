@@ -12,4 +12,8 @@ class Admin::BaseController < ApplicationController
   def set_content_type
     headers['Content-Type'] ||= 'text/html; charset=utf-8'
   end
+  
+  def load_uploads
+    @uploads ||= Upload.recents
+  end
 end
