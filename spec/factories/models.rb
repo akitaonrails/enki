@@ -1,6 +1,8 @@
 Factory.define(:post) do |p|
   p.title 'Foo'
+  p.excerpt 'this is an excerpt'
   p.body 'this is a post'
+  p.minor_edit 0
 end
 
 Factory.define(:comment) do |c|

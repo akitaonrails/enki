@@ -1,6 +1,11 @@
 <h2><%= link_to(h(post.title), post_path(post)) %></h2> 
 <div class="entrybody">
-  <%= post.body_html.untaint %>
+	<% if homepage -%>
+	<%= post.excerpt_html.blank? ? post.body_html.untaint : post.excerpt_html.untaint %>
+	<% else -%>
+	<%= post.excerpt_html.untaint unless post.excerpt_html.blank? -%>
+	<%= post.body_html.untaint %>
+	<% end -%>
 </div>
 <div class="meta">
   <ul>

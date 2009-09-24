@@ -181,10 +181,25 @@ form button {
   font: 8pt "lucida grande", "lucida sans unicode", "lucida", sans-serif;
 }
 
+#post_excerpt_box {
+  display: none;
+  width: 600px;
+}
+
+#post_excerpt_toggle {
+  width: 600px;
+  text-align: center;
+}
+
+#post_excerpt {
+  width: 600px;
+  height: 300px;
+}
+
 #post_body,
 #page_body {
   width: 600px;
-  height: 450px;
+  height: 500px;
 }
 
 form fieldset { margin-bottom: 10px; width: 622px; padding: 10px; }

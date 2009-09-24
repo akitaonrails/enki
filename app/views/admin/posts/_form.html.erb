@@ -4,6 +4,10 @@
 
 <% form.input_field_set do -%>
   <%= form.input :title -%>
+	<div id="post_excerpt_toggle"><%= link_to_function "toggle excerpt", "$('#post_excerpt_box').toggle();" %></div>
+	<div id="post_excerpt_box">
+		<%= form.input :excerpt %>		
+	</div>
   <%= form.input :body, :hint => "<a href='http://hobix.com/textile/quick.html'>Textile enabled</a>. Use Ctrl+E to switch between preview and edit mode." -%>
   <%= form.input :tag_list, :as => 'string', :required => false, :hint => 'Comma separated: ruby, rails&hellip;' -%>
 <% end -%>

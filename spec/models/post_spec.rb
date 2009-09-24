@@ -169,12 +169,7 @@ end
 
 describe Post, 'validations' do
   def valid_post_attributes
-    {
-      :title                => "My Post",
-      :slug                 => "my-post",
-      :body                 => "hello this is my post",
-      :published_at_natural => 'now'
-    }
+    Factory.attributes_for(:post)
   end
 
   it 'is valid with valid_post_attributes' do
@@ -192,6 +187,11 @@ describe Post, 'validations' do
   it 'is invalid with bogus published_at_natural' do
     Post.new(valid_post_attributes.merge(:published_at_natural => 'bogus')).should_not be_valid
   end
+  
+  it "is valid if it has a body but no excerpt" do
+    valid_post_attributes.delete(:excerpt)
+    Post.new(valid_post_attributes).should be_valid
+  end
 end
 
 describe Post, 'being destroyed' do
@@ -202,7 +202,7 @@ end
 
 describe Post, '.build_for_preview' do
   before(:each) do
-    @post = Post.build_for_preview(:title => 'My Post', :body => "body", :tag_list => "ruby")
+    @post = Post.build_for_preview(Factory.attributes_for(:post, :tag_list => "ruby"))
   end
 
   it 'returns a new post' do
@@ -219,7 +219,7 @@ describe Post, '.build_for_preview' do
   end
   
   it 'applies filter to body' do
-    @post.body_html.should == '<p>body</p>'
+    @post.body_html.should == '<p>this is a post</p>'
   end
 
   it 'generates tags from tag_list' do

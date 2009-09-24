@@ -8,6 +8,7 @@ describe "/posts/index.html.erb" do
 
     mock_post = mock_model(Post,
       :title             => "A post".taint,
+      :excerpt_html      => "Excerpt contents!".taint,
       :body_html         => "Posts contents!".taint,
       :published_at      => 1.year.ago.taint,
       :slug              => 'a-post'.taint,

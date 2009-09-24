@@ -69,7 +69,7 @@ describe Admin::PostsController do
 
     it 'updates the post' do
       published_at = Time.now
-      @post.should_receive(:update_attributes).with(valid_post_attributes)
+      @post.should_receive(:update_attributes).with(valid_post_attributes.stringify_keys)
 
       Time.stub!(:now).and_return(published_at)
       do_put
@@ -122,11 +122,7 @@ describe Admin::PostsController do
   end
 
   def valid_post_attributes
-    {
-      'title'      => "My Post",
-      'body'       => "hello this is my post",
-      'minor_edit' => "0"
-    }
+    Factory.attributes_for(:post)
   end
 
   describe 'handling DELETE to destroy' do

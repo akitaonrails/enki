@@ -8,6 +8,7 @@ describe "/posts/index.atom.builder" do
 
     mock_post = mock_model(Post,
       :title             => "A post",
+      :excerpt_html      => "Excerpt",
       :body_html         => "Posts contents!",
       :published_at      => 1.year.ago,
       :edited_at         => 1.year.ago,
