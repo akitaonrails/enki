@@ -1,11 +1,11 @@
 atom_feed(
   :url         => formatted_posts_path(:tag => @tag, :format => 'atom', :only_path => false), 
   :root_url    => posts_path(:tag => @tag, :only_path => false),
-  :schema_date => '2008'
+  :schema_date => Time.now.year
 ) do |feed|
   feed.title     posts_title(@tag)
   feed.updated   @posts.empty? ? Time.now.utc : @posts.collect(&:edited_at).max
-  feed.generator "Enki", "uri" => "http://enkiblog.com"
+  feed.generator Enki::Config.default[:title], "uri" => Enki::Config.default[:url]
 
   feed.author do |xml|
     xml.name  author.name

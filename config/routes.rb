@@ -22,6 +22,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :posts
 
   map.resources :pages
+  
+  map.resources :comments
 
   map.connect ':year/:month/:day/:slug/comments', :controller => 'comments', :action => 'index'
   map.connect ':year/:month/:day/:slug/comments/new', :controller => 'comments', :action => 'new'

@@ -69,7 +69,8 @@ describe PostsController do
   describe 'handling GET to index with invalid tag'do
     it "returns missing" do
       Post.stub!(:find_recent).and_return([])
-      lambda { get :index, :tag => 'bogus' }.should raise_error(ActiveRecord::RecordNotFound)
+      get :index, :tag => 'bogus'
+      response.should redirect_to(page_path('bogus'))
     end
   end
 

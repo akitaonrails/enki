@@ -13,7 +13,14 @@ class CommentsController < ApplicationController
     if request.post? || using_open_id?
       create
     else
-      redirect_to(post_path(@post))
+      respond_to do |format|
+        format.html do
+          @post ? redirect_to(post_path(@post)) : redirect_to(root_path)
+        end
+        format.atom do
+          @comments =  @post ? @post.approved_comments.all : Comment.latests(:joins => :post).all
+        end
+      end
     end
   end
 
@@ -66,6 +73,8 @@ class CommentsController < ApplicationController
   protected
 
   def find_post
-    @post = Post.find_by_permalink(*[:year, :month, :day, :slug].collect {|x| params[x] })
+    if params.keys.include?(:year) or params.keys.include?("year")
+      @post = Post.find_by_permalink(*[:year, :month, :day, :slug].collect {|x| params[x] })
+    end
   end
 end

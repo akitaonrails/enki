@@ -233,3 +233,31 @@ describe CommentsController, 'with an AJAX request to new' do
     assigns(:comment).should == @comment
   end
 end
+
+describe CommentsController, 'handling GET to /comments.atom'do
+  before(:each) do
+    @comments = [Factory.create(:comment, :akismet => 'ham')]
+  end
+
+  def do_get
+    @request.env["HTTP_ACCEPT"] = "application/atom+xml"
+    get :index
+  end
+
+  it "should be successful" do
+    do_get
+    response.should be_success
+  end
+
+  it "should render index template" do
+    do_get
+    response.should render_template('index')
+  end
+
+  it "should assign the found posts for the view" do
+    do_get
+    assigns[:comments].should == @comments
+  end
+
+  it_should_behave_like('ATOM feed')
+end

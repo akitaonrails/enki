@@ -25,7 +25,11 @@ module Enki
     end
 
     def self.default_location
-      "#{RAILS_ROOT}/config/enki.yml"
+      if ENV["RAILS_ENV"] == 'test'
+        "#{RAILS_ROOT}/config/enki.yml.example"
+      else
+        "#{RAILS_ROOT}/config/enki.yml"
+      end
     end
 
     private

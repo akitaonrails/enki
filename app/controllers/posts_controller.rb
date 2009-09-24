@@ -3,10 +3,10 @@ class PostsController < ApplicationController
     @tag = params[:tag]
     @posts = Post.find_recent(:tag => @tag, :include => :tags)
 
-    raise(ActiveRecord::RecordNotFound) if @tag && @posts.empty?
-
     respond_to do |format|
-      format.html
+      format.html {
+        redirect_to page_path(params[:tag]) if @tag && @posts.empty?
+      }
       format.atom { render :layout => false }
     end
   end
