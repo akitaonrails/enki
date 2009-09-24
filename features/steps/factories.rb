@@ -20,5 +20,6 @@ Factory.define(:comment) do |a|
   a.author_email 'enki@enkiblog.com'
   a.author_url   'http://enkiblog.com'
   a.body     'I find this article thought provoking'
+  a.akismet  'ham'
   a.association :post
 end

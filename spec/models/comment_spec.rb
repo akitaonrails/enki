@@ -134,6 +134,14 @@ describe Comment, '.find_recent' do
   it 'allows and override of the default limit' do
     Comment.find_recent(:limit => 2).size.should == 2
   end
+  
+  it "should find latest comments that are not spam" do
+    5.times.map do |i| 
+      @comments[i].akismet = 'spam'
+      @comments[i].save
+    end
+    Comment.latests.count.should be(Comment::DEFAULT_LIMIT - 5)
+  end
 end
 
 describe Comment, '.build_for_preview' do

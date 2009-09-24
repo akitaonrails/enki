@@ -3,9 +3,9 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe ArchivesController do
   describe 'handling GET to index' do
     before(:each) do
-      month = Struct.new(:date, :posts)
-      @months = [month.new(1.month.ago.utc.beginning_of_month, [mock_model(Post)])]
-      Post.stub!(:find_all_grouped_by_month).and_return(@months)
+      @posts = [mock_model(Post), mock_model(Post)]
+      Post.stub!(:archives).and_return(mock(Object))
+      Post.archives.stub!(:all).and_return(@posts)
     end
 
     def do_get
@@ -24,11 +24,13 @@ describe ArchivesController do
 
     it "should assign the found months for the view" do
       do_get
-      assigns[:months].should == @months
+      assigns[:posts].should == @posts
     end
 
     it 'should find posts grouped by month' do
-      Post.should_receive(:find_all_grouped_by_month).and_return(@months)
+      mock_obj = mock(Object)
+      mock_obj.should_receive(:all).and_return(@posts)
+      Post.stub!(:archives).and_return(mock_obj)
       do_get
     end
   end

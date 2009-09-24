@@ -14,6 +14,11 @@ class Comment < ActiveRecord::Base
 
   validates_presence_of :author, :body, :post
 
+  named_scope           :latests, :order => "comments.updated_at DESC", 
+    :limit => DEFAULT_LIMIT,
+    :joins => [:post], :conditions => ['comments.akismet = ?', 'ham'],
+    :select => "comments.id, comments.post_id, comments.body, comments.author, comments.created_at, posts.published_at"
+
   # validate :open_id_thing
   def validate
     super 

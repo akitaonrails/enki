@@ -1,5 +1,5 @@
 class Post < ActiveRecord::Base
-  DEFAULT_LIMIT = 15
+  DEFAULT_LIMIT = 30
 
   acts_as_taggable
 
@@ -14,6 +14,22 @@ class Post < ActiveRecord::Base
 
   validate                :validate_published_at_natural
 
+  named_scope             :latests, :order => "published_at DESC", 
+    :limit => DEFAULT_LIMIT,
+    :select => "id, title, slug, published_at"
+  
+  named_scope             :archives, lambda { |params|
+    beginning_of_month = if params && params[:year] && params[:month]
+        Time.parse("#{params[:year]}-#{params[:month]}-01")
+      else
+        Time.now.beginning_of_month
+      end
+    end_of_month = beginning_of_month.end_of_month  
+    { :conditions => ["published_at between ? and ?", beginning_of_month, end_of_month],
+      :order => "published_at DESC",
+      :select => "id, title, slug, published_at" }
+  }
+  
   def validate_published_at_natural
     errors.add("published_at_natural", "Unable to parse time") unless published?
   end
@@ -76,15 +92,27 @@ class Post < ActiveRecord::Base
       post || raise(ActiveRecord::RecordNotFound)
     end
 
-    def find_all_grouped_by_month
-      posts = find(
-        :all,
-        :order      => 'posts.published_at DESC',
-        :conditions => ['published_at < ?', Time.now]
-      )
-      month = Struct.new(:date, :posts)
-      posts.group_by(&:month).sort_by{ |v| v[0] }.inject([]) {|a, v| a << month.new(v[0], v[1])}
-    end
+    def find_archives_links
+      if connection.class.to_s =~ /SQLite3/
+        connection.select_all("select count(*) as total, 
+          strftime('%Y', published_at) as year, 
+          strftime('%m', published_at) as month,
+          strftime('%Y%m', published_at) as grouper
+          from posts 
+          group by year,month
+          order by grouper DESC").
+            map(&:symbolize_keys!)
+      elsif connection.class.to_s =~ /Mysql/
+        connection.select_all("select count(*) as total, 
+          year(published_at) as year, 
+          month(published_at) as month,
+          date_format(published_at, '%Y%m') as grouper
+          from posts 
+          group by year,month
+          order by grouper DESC").
+            map(&:symbolize_keys!)
+      end
+    end    
   end
 
   def destroy_with_undo

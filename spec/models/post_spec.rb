@@ -27,16 +27,6 @@ describe Post, ".find_recent" do
     Post.find_recent(:tag => 'code').should have(2).things
   end
 
-  it 'finds all posts grouped by month' do
-    days = [1,2,3] # consecutive days, the order is important in the comparison later
-    posts = [1,1,2].map do |month|
-      Factory.create(:post, :published_at => Time.utc(2009,month,days.shift))
-    end
-    
-    months = Post.find_all_grouped_by_month.collect {|month| [month.date.month, month.posts]}
-    months.should == [[1, [posts[1], posts[0]]], [2, [posts[2]]]]
-  end
-  
   it "find by permalink using several examples" do
     post = Factory.create(:post, :published_at => Time.utc(2009,9,4))
     Post.find_by_permalink(2009,9,4,'foo').should == post
@@ -47,6 +37,27 @@ describe Post, ".find_recent" do
     lambda { 
       Post.find_by_permalink(2009,40,50,'foo') 
     }.should raise_error(ActiveRecord::RecordNotFound)
+  end
+  
+  it "find archives counter grouped by year and month in descending order" do
+    Factory.create(:post, :published_at => Time.utc(2007,1,1))
+    Factory.create(:post, :published_at => Time.utc(2009,5,1))
+    Factory.create(:post, :published_at => Time.utc(2007,12,1))
+    Factory.create(:post, :published_at => Time.utc(2008,6,1))
+    Factory.create(:post, :published_at => Time.utc(2008,5,1))
+    Factory.create(:post, :published_at => Time.utc(2009,1,1))
+    Factory.create(:post, :published_at => Time.utc(2009,11,1))
+    result = Post.find_archives_links.map { |l| l[:grouper] }
+    result.should == ["200911", "200905", "200901", "200806", "200805", "200712", "200701"]
+  end
+  
+  it "find subset of archive posts within a date range" do
+    @p1 = Factory.create(:post, :published_at => Time.utc(2007,7,15))
+    @p2 = Factory.create(:post, :published_at => Time.utc(2008,7,15))
+    @p3 = Factory.create(:post, :published_at => Time.utc(2009,7,15))
+    Time.stub!(:now).and_return(Time.utc(2008,7,15))
+    Post.archives({}).all == [@p2]
+    Post.archives({ :year => "2009", :month => "07" }).all == [@p3]
   end
 end
 
