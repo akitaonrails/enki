@@ -1,26 +1,27 @@
 # Enables Page Caching support for major controllers
 if Enki::Config.default[:enable_sweepers]
-  class Admin::CommentsController < Admin::BaseController
+
+  ::Admin::CommentsController.class_eval do
     cache_sweeper :comment_sweeper, :only => [:create, :update, :destroy]
   end
-  class Admin::PagesController < Admin::BaseController
+  ::Admin::PagesController.class_eval do
     cache_sweeper :page_sweeper, :only => [:create, :update, :destroy]
   end
-  class Admin::PostsController < Admin::BaseController
+  ::Admin::PostsController.class_eval do
     cache_sweeper :post_sweeper, :only => [:create, :update, :destroy]
   end
 
-  class ArchivesController < ApplicationController
+  ::ArchivesController.class_eval do
     caches_page :index
   end
-  class CommentsController < ApplicationController
+  ::CommentsController.class_eval do
     caches_page :index
     cache_sweeper :comment_sweeper, :only => [:create]
   end
-  class PagesController < ApplicationController
+  ::PagesController.class_eval do
     caches_page :show
   end
-  class PostsController < ApplicationController
+  ::PostsController.class_eval do
     caches_page :index
     caches_page :show
   end
