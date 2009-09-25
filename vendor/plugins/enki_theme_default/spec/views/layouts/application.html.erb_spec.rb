@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../spec_helper'
+require File.dirname(__FILE__) + '/../../../../../../spec/spec_helper'
 
 describe "/layouts/application.html.erb" do
   before(:each) do

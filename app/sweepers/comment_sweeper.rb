@@ -18,15 +18,10 @@ class CommentSweeper < ActionController::Caching::Sweeper
   private
   
   def expire_cache_for(comment)
-    erase("#{ActionController::Base.page_cache_directory}/index.html")
+    FileUtils.rm_rf("#{ActionController::Base.page_cache_directory}/index.html")
     Dir.glob("#{RAILS_ROOT}/tmp/cache/views/*").each do |dir|
-      erase("#{dir}#{post_path(comment.post)}.cache")
+      FileUtils.rm_rf("#{dir}#{post_path(comment.post)}.cache")
     end
-    expire_path(post_path(comment.post))
-  end
-  
-  def erase(path)
-    FileUtils.rm_rf(path)
-    logger.info("  Expiring: #{path}")
+    expire_page(post_path(comment.post))
   end
 end

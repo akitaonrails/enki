@@ -19,21 +19,16 @@ class PostSweeper < ActionController::Caching::Sweeper
   
   def expire_cache_for(post)
     Dir.glob("#{ActionController::Base.page_cache_directory}/*.html") do |file|
-      erase(file) unless file =~ /[404|422|500]\.html$/
+      FileUtils.rm_rf(file) unless file =~ /[404|422|500]\.html$/
     end
     Dir.glob("#{ActionController::Base.page_cache_directory}/*.atom") do |file|
-      erase(file) unless file =~ /[404|422|500]\.html$/
+      FileUtils.rm_rf(file) unless file =~ /[404|422|500]\.html$/
     end
     Dir.glob("#{RAILS_ROOT}/tmp/cache/views/*").each do |dir|
-      erase("#{dir}#{post_path(post)}.cache")
-      erase("#{dir}/posts/#{post.id}/print.cache")
+      FileUtils.rm_rf("#{dir}#{post_path(post)}.cache")
+      FileUtils.rm_rf("#{dir}/posts/#{post.id}/print.cache")
     end
     expire_page(post_path(post))
     expire_page(archives_path(:month => post.published_at.month, :year => post.published_at.year))
-  end
-  
-  def erase(path)
-    FileUtils.rm_rf(path)
-    logger.info("  Expiring: #{path}")
   end
 end

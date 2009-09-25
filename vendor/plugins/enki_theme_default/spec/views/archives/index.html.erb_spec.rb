@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../spec_helper'
+require File.dirname(__FILE__) + '/../../../../../../spec/spec_helper'
 
 describe "/archives/index.html.erb" do
   def tag(name)

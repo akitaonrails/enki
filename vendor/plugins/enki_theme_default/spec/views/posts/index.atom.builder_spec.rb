@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../spec_helper'
+require File.dirname(__FILE__) + '/../../../../../../spec/spec_helper'
 
 describe "/posts/index.atom.builder" do
   before(:each) do
