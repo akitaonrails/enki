@@ -34,15 +34,14 @@ class CommentsController < ApplicationController
     end
   end
 
-  def create
+  def create    
+    @comment = Comment.new((session[:pending_comment] || params[:comment] || {}).reject {|key, value| !Comment.protected_attribute?(key) })
+    @comment.post = @post
     # spam protection - if someone fill in the hidden 'email' field, it's a bot
     if !params[:email].blank? || @comment.body.size < 10
       redirect_to post_path(@post)
       return
     end
-    
-    @comment = Comment.new((session[:pending_comment] || params[:comment] || {}).reject {|key, value| !Comment.protected_attribute?(key) })
-    @comment.post = @post
 
     session[:pending_comment] = nil
 
