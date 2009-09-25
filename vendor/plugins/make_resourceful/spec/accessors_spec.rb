@@ -77,7 +77,7 @@ describe Resourceful::Default::Accessors, "#current_object on a singular control
   before :each do
     mock_controller Resourceful::Default::Accessors
     @controller.stubs(:plural?).returns(false)
-    @controller.stubs(:instance_variable_name).returns("post")
+    @controller.stubs(:controller_name).returns("posts")
 
     @parent = stub('parent')
     @controller.stubs(:parent_object).returns(@parent)
@@ -86,7 +86,7 @@ describe Resourceful::Default::Accessors, "#current_object on a singular control
     @object = stub
   end
 
-  it "should look up the instance object of the parent object" do
+  it "should return the instance object from parent object" do
     @parent.expects(:post).returns(@object)
     @controller.current_object.should == @object
   end
@@ -138,6 +138,9 @@ describe Resourceful::Default::Accessors, "#build_object with a non-#build-able 
     mock_controller Resourceful::Default::Accessors
     @params = {:name => "Bob", :password => "hideously insecure"}
     @controller.stubs(:object_parameters).returns(@params)
+
+    @controller.stubs(:singular?).returns(false)
+    @controller.stubs(:parent?).returns(false)
 
     @object = stub
     @model = stub
@@ -339,6 +342,7 @@ describe Resourceful::Default::Accessors, " with no parents" do
     mock_controller Resourceful::Default::Accessors
     @controller.stubs(:parents).returns([])
     @controller.stubs(:current_model_name).returns('Line')
+    @controller.stubs(:params).returns({})
     stub_const 'Line'
   end
 
@@ -352,6 +356,32 @@ describe Resourceful::Default::Accessors, " with no parents" do
 
   it "should return the unscoped model for #current_model" do
     @controller.current_model.should == Line
+  end
+end
+
+describe Resourceful::Default::Accessors, " for a singular controller with a parent" do
+  include ControllerMocks
+  before :each do
+    mock_controller Resourceful::Default::Accessors
+    @controller.stubs(:singular?).returns(true)
+    
+    @model = stub_model('Thing')    
+    @model.send(:attr_accessor, :person_id)
+    @controller.stubs(:current_model).returns(@model)
+
+    @person = stub_model('Person')
+    @person.stubs(:id).returns 42
+    @controller.stubs(:parent_object).returns(@person)
+    @controller.stubs(:parent_name).returns('person')
+    @controller.stubs(:parent?).returns(true)
+
+    @controller.stubs(:object_parameters).returns :thinginess => 12, :bacon => true
+  end
+
+  it "should set assign the parent's id to a newly built object" do
+    thing = @controller.build_object
+    thing.thinginess.should == 12
+    thing.person_id.should == @person.id
   end
 end
 
