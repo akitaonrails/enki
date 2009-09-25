@@ -35,6 +35,12 @@ class CommentsController < ApplicationController
   end
 
   def create
+    # spam protection - if someone fill in the hidden 'email' field, it's a bot
+    if !params[:email].blank? || @comment.body.size < 10
+      redirect_to post_path(@post)
+      return
+    end
+    
     @comment = Comment.new((session[:pending_comment] || params[:comment] || {}).reject {|key, value| !Comment.protected_attribute?(key) })
     @comment.post = @post
 
@@ -59,7 +65,10 @@ class CommentsController < ApplicationController
         end
       end
     end
-
+    # record client's ip
+    @comment.user_ip = request.remote_ip
+    @comment.referrer = request.referrer
+    
     if session[:pending_comment].nil? && @comment.save
       if Enki::Config.default[:comment_start_as] == 'spam'
         flash[:notice] = 'Your comment is awaiting for approval.'

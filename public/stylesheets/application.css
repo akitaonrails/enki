@@ -467,3 +467,6 @@ ol.CodeRay li { white-space: pre }
 .v  { color:#036 }
 .xt { color:#444 }
 
+.botmail {
+  display: none;
+}
