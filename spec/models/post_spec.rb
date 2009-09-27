@@ -85,6 +85,12 @@ describe Post, '#generate_slug' do
     post.generate_slug
     post.title.should == 'My Post'
   end
+  
+  it "should handle latin accented characters without ditching them" do
+    post = Post.new(:title => 'Este é um Título Acentuado com Exceções')
+    post.generate_slug
+    post.slug.should == 'este-e-um-titulo-acentuado-com-excecoes'
+  end
 end
 
 describe Post, '#tag_list=' do
@@ -235,5 +241,13 @@ describe Post, '.build_for_preview' do
 
   it 'generates tags from tag_list' do
     @post.tags.collect {|tag| tag.name}.should == ['ruby']
+  end
+end
+
+describe Post, ".permalink" do
+  it "should return a human readable permalink" do
+    @post = Factory.build(:post, :title => "This is a blog post", :published_at => Time.utc(2009,9,27))
+    @post.generate_slug
+    @post.permalink.should == "/2009/09/27/this-is-a-blog-post"
   end
 end

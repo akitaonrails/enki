@@ -2,9 +2,9 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe CommentsController, 'with GET to #index' do
   it 'redirects to the parent post URL' do
-    @mock_post = mock_model(Post,
-      :published_at => 1.year.ago,
-      :slug         => 'a-post'
+    @mock_post = Factory.create(:post,
+      :published_at => Time.utc(2007,1,1),
+      :title        => 'A Post'
     )
     Post.stub!(:find_by_permalink).and_return(@mock_post)
     get :index, :year => '2007', :month => '01', :day => '01', :slug => 'a-post'
@@ -41,18 +41,11 @@ end
 
 describe CommentsController, 'handling commenting' do
   def mock_post!
-    @mock_post = mock_model(Post)
-    {
-      :approved_comments           => @mock_comments = [mock_model(Comment)],
-      :new_record?                 => false,
+    @mock_post = Factory.create(:post,
       :published_at                => 1.year.ago,
-      :created_at                  => 1.year.ago,
-      :denormalize_comments_count! => nil,
-      :slug                        => 'a-post',
-      :day                         => '01'
-    }.each_pair do |attribute, value|
-      @mock_post.stub!(attribute).and_return(value)
-    end
+      :created_at                  => 1.year.ago
+    )
+    @mock_post.comments << (Factory.create(:comment))
     Post.stub!(:find_by_permalink).and_return(@mock_post)
     @mock_post
   end

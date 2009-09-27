@@ -150,4 +150,9 @@ class Post < ActiveRecord::Base
     value = value.join(", ") if value.respond_to?(:join)
     super(value)
   end
+  
+  def permalink(options = {})
+    suffix = options[:anchor] ? "##{options[:anchor]}" : ""
+    published_at.strftime("/%Y/%m/%d/") + slug + suffix
+  end
 end
