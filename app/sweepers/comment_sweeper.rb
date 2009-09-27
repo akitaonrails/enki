@@ -20,8 +20,8 @@ class CommentSweeper < ActionController::Caching::Sweeper
   def expire_cache_for(comment)
     FileUtils.rm_rf("#{ActionController::Base.page_cache_directory}/index.html")
     Dir.glob("#{RAILS_ROOT}/tmp/cache/views/*").each do |dir|
-      FileUtils.rm_rf("#{dir}#{post_path(comment.post)}.cache")
+      FileUtils.rm_rf("#{dir}#{comment.post.permalink}.cache")
     end
-    expire_page(post_path(comment.post))
+    expire_page(comment.post.permalink)
   end
 end
