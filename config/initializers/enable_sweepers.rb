@@ -2,7 +2,7 @@
 if Enki::Config.default[:enable_sweepers]
 
   ::Admin::CommentsController.class_eval do
-    cache_sweeper :comment_sweeper, :only => [:create, :update, :destroy]
+    cache_sweeper :comment_sweeper, :only => [:create, :update, :destroy, :mark_as_ham, :mark_as_spam]
   end
   ::Admin::PagesController.class_eval do
     cache_sweeper :page_sweeper, :only => [:create, :update, :destroy]
