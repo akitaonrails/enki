@@ -1,6 +1,19 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+describe 'cacheable posts list', :shared => true do
+  it "should setup cache control to public" do
+    do_get
+    response.headers["Cache-Control"].should == "public"
+  end
+
+  it "should setup ETag" do
+    do_get
+    response.headers["ETag"].should == '"c81e728d9d4c2f636f067f89cc14862c"'
+  end
+end
+
 describe 'successful posts list', :shared => true do
+    
   it "should be successful" do
     do_get
     response.should be_success
@@ -20,7 +33,7 @@ end
 describe PostsController do
   describe 'handling GET to index'do
     before(:each) do
-      @posts = [mock_model(Post)]
+      @posts = [mock_model(Post, :approved_comments_count => 1)]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -29,6 +42,7 @@ describe PostsController do
     end
 
     it_should_behave_like('successful posts list')
+    it_should_behave_like('cacheable posts list')
 
     it "should find recent posts" do
       Post.should_receive(:find_recent).with(:tag => nil, :include => :tags).and_return(@posts)
@@ -38,7 +52,7 @@ describe PostsController do
 
   describe 'handling GET to index with tag'do
     before(:each) do
-      @posts = [mock_model(Post)]
+      @posts = [mock_model(Post, :approved_comments_count => 1)]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -47,6 +61,7 @@ describe PostsController do
     end
 
     it_should_behave_like('successful posts list')
+    it_should_behave_like('cacheable posts list')
 
     it "should find recent tagged posts" do
       Post.should_receive(:find_recent).with(:tag => 'code', :include => :tags).and_return(@posts)
@@ -75,7 +90,7 @@ describe PostsController do
 
   describe 'handling GET to /posts.atom'do
     before(:each) do
-      @posts = [mock_model(Post)]
+      @posts = [mock_model(Post, :approved_comments_count => 1)]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -95,7 +110,7 @@ describe PostsController do
 
   describe 'handling GET to /posts.atom with tag'do
     before(:each) do
-      @posts = [mock_model(Post)]
+      @posts = [mock_model(Post, :approved_comments_count => 1)]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -115,7 +130,7 @@ describe PostsController do
 
   describe "handling GET for a single post" do
     before(:each) do
-      @post = mock_model(Post)
+      @post = mock_model(Post, :updated_at => Time.now, :approved_comments_count => 1)
       @comment = mock_model(Post)
       Post.stub!(:find_by_permalink).and_return(@post)
       Comment.stub!(:new).and_return(@comment)

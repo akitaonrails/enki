@@ -2,9 +2,8 @@ class PostsController < ApplicationController
   def index
     @tag = params[:tag]
     @posts = Post.find_recent(:tag => @tag, :include => :tags)
-    fresh_when :etag => index_etag(@posts), :public => true
-
     raise(ActiveRecord::RecordNotFound) if @tag && @posts.empty?
+    fresh_when :etag => index_etag(@posts), :public => true
 
     respond_to do |format|
       format.html
