@@ -76,6 +76,7 @@ describe PostsController do
 
     def do_get
       get :index
+      response.headers["ETag"].should == '"cfcd208495d565ef66e7dff9f98764da"'
     end
 
     it_should_behave_like('successful posts list')
@@ -130,10 +131,15 @@ describe PostsController do
 
   describe "handling GET for a single post" do
     before(:each) do
-      @post = mock_model(Post, :updated_at => Time.now, :approved_comments_count => 1)
+      @post = mock_model(Post, :updated_at => "2009-01-01".to_date.to_time, :approved_comments_count => 1)
       @comment = mock_model(Post)
       Post.stub!(:find_by_permalink).and_return(@post)
       Comment.stub!(:new).and_return(@comment)
+    end
+    
+    after(:each) do
+      response.headers["Cache-Control"].should == "public"
+      response.headers["ETag"].should == '"7f728651b8e24857cfce817ed260464c"'
     end
 
     def do_get
