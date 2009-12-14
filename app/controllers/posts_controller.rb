@@ -20,7 +20,7 @@ class PostsController < ApplicationController
   private
   
     def index_etag(posts)
-      etag = posts.count
+      etag = posts.size
       posts.map(&:approved_comments_count).each {|count| etag += count.to_i}
       etag
     end
