@@ -2,7 +2,7 @@ module DateHelper
   def format_month(date)
     date.try(:strftime, "%B %y")
   end
-  
+
   def format_post_date(date)
     date.try(:strftime, "%B %d, %Y")
   end

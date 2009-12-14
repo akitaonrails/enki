@@ -21,7 +21,7 @@ class Comment < ActiveRecord::Base
 
   # validate :open_id_thing
   def validate
-    super 
+    super
     errors.add(:base, openid_error) unless openid_error.blank?
   end
   
@@ -34,7 +34,7 @@ class Comment < ActiveRecord::Base
     self.author_email = "" unless self.author_email
     self.author_url = "" unless self.author_url
   end
-  
+
   def blank_openid_fields
     self.author_url = ""
     self.author_email = ""
@@ -55,7 +55,7 @@ class Comment < ActiveRecord::Base
   def approved?
     true
   end
- 
+
   def denormalize
     self.post.denormalize_comments_count!
   end
@@ -78,7 +78,7 @@ class Comment < ActiveRecord::Base
     def protected_attribute?(attribute)
       [:author, :body].include?(attribute.to_sym)
     end
-    
+
     def new_with_filter(params)
       comment = Comment.new(params)
       comment.created_at = Time.now

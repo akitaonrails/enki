@@ -1,4 +1,4 @@
-<h2><%= link_to(h(post.title), post_path(post)) %></h2> 
+<h2><%= link_to(h(post.title), post_path(post)) %></h2>
 <div class="entrybody">
 	<% if homepage -%>
 	<%= post.excerpt_html.blank? ? post.body_html.untaint : post.excerpt_html.untaint %>

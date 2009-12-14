@@ -1,10 +1,17 @@
 class Admin::HealthController < Admin::BaseController
-  verify :method => 'post', :only => 'throw_exception', :render => {:text => 'Method not allowed', :status => 405}, :add_headers => {"Allow" => "POST"}
+  before_filter :require_login
+  verify :method => 'post',
+         :only   => 'generate_exception',
+         :add_headers => {
+           "Allow" => "POST"},
+         :render => {
+           :text   => 'Method not allowed',
+           :status => 405}
 
   def index
   end
 
-  def throw_exception
+  def generate_exception
     raise RuntimeError
   end
 end

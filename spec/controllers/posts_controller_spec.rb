@@ -1,6 +1,19 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+describe 'cacheable posts list', :shared => true do
+  it "should setup cache control to public" do
+    do_get
+    response.headers["Cache-Control"].should == "public"
+  end
+
+  it "should setup ETag" do
+    do_get
+    response.headers["ETag"].should == '"c81e728d9d4c2f636f067f89cc14862c"'
+  end
+end
+
 describe 'successful posts list', :shared => true do
+    
   it "should be successful" do
     do_get
     response.should be_success
@@ -20,7 +33,7 @@ end
 describe PostsController do
   describe 'handling GET to index'do
     before(:each) do
-      @posts = [mock_model(Post)]
+      @posts = [mock_model(Post, :approved_comments_count => 1)]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -29,7 +42,8 @@ describe PostsController do
     end
 
     it_should_behave_like('successful posts list')
-  
+    it_should_behave_like('cacheable posts list')
+
     it "should find recent posts" do
       Post.should_receive(:find_recent).with(:tag => nil, :include => :tags).and_return(@posts)
       do_get
@@ -38,7 +52,7 @@ describe PostsController do
 
   describe 'handling GET to index with tag'do
     before(:each) do
-      @posts = [mock_model(Post)]
+      @posts = [mock_model(Post, :approved_comments_count => 1)]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -47,13 +61,14 @@ describe PostsController do
     end
 
     it_should_behave_like('successful posts list')
+    it_should_behave_like('cacheable posts list')
 
     it "should find recent tagged posts" do
       Post.should_receive(:find_recent).with(:tag => 'code', :include => :tags).and_return(@posts)
       do_get
     end
   end
-  
+
   describe 'handling GET to index with no posts' do
     before(:each) do
       @posts = []
@@ -61,6 +76,7 @@ describe PostsController do
 
     def do_get
       get :index
+      response.headers["ETag"].should == '"cfcd208495d565ef66e7dff9f98764da"'
     end
 
     it_should_behave_like('successful posts list')
@@ -69,14 +85,13 @@ describe PostsController do
   describe 'handling GET to index with invalid tag'do
     it "returns missing" do
       Post.stub!(:find_recent).and_return([])
-      get :index, :tag => 'bogus'
-      response.should redirect_to(page_path('bogus'))
+      lambda { get :index, :tag => 'bogus' }.should raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
   describe 'handling GET to /posts.atom'do
     before(:each) do
-      @posts = [mock_model(Post)]
+      @posts = [mock_model(Post, :approved_comments_count => 1)]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -96,7 +111,7 @@ describe PostsController do
 
   describe 'handling GET to /posts.atom with tag'do
     before(:each) do
-      @posts = [mock_model(Post)]
+      @posts = [mock_model(Post, :approved_comments_count => 1)]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -116,12 +131,17 @@ describe PostsController do
 
   describe "handling GET for a single post" do
     before(:each) do
-      @post = mock_model(Post)
+      @post = mock_model(Post, :updated_at => "2009-01-01".to_date.to_time, :approved_comments_count => 1)
       @comment = mock_model(Post)
       Post.stub!(:find_by_permalink).and_return(@post)
       Comment.stub!(:new).and_return(@comment)
     end
-  
+    
+    after(:each) do
+      response.headers["Cache-Control"].should == "public"
+      response.headers["ETag"].should == '"7f728651b8e24857cfce817ed260464c"'
+    end
+
     def do_get
       get :show, :year => '2008', :month => '01', :day => '01', :slug => 'a-post'
     end
@@ -130,22 +150,22 @@ describe PostsController do
       do_get
       response.should be_success
     end
-  
+
     it "should render show template" do
       do_get
       response.should render_template('show')
     end
-  
+
     it "should find the post requested" do
       Post.should_receive(:find_by_permalink).with('2008', '01', '01', 'a-post', :include => [:approved_comments, :tags]).and_return(@post)
       do_get
     end
-  
+
     it "should assign the found post for the view" do
       do_get
       assigns[:post].should equal(@post)
     end
-  
+
     it "should assign a new comment for the view" do
       do_get
       assigns[:comment].should equal(@comment)
