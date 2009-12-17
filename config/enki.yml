@@ -9,8 +9,9 @@ author:
       - http://enkiblog.com
       - http://secondaryopenid.com
 
-# Delete the following section if your site will not be acting as an OpenID delegate (http://wiki.openid.net/Delegation)
-# If you're deploying with mongrel, make sure you read http://rhnh.net/2008/04/13/nginx-openid-delegation-and-yadis
+comment_start_as: ham       # make comments start hidden if you set this to 'spam'
+enable_sweepers: no         # enable or disable page caching with 'yes' or 'no'
+
 open_id_delegation:
   server:   http://www.myopenid.com/server
   delegate: http://username.myopenid.com
