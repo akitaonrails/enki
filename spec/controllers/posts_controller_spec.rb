@@ -8,7 +8,7 @@ describe 'cacheable posts list', :shared => true do
 
   it "should setup ETag" do
     do_get
-    response.headers["ETag"].should == '"c81e728d9d4c2f636f067f89cc14862c"'
+    response.headers["ETag"].should == '"e872d1baf47e47e3278d3e114e192806"'
   end
 end
 
@@ -33,7 +33,7 @@ end
 describe PostsController do
   describe 'handling GET to index'do
     before(:each) do
-      @posts = [mock_model(Post, :approved_comments_count => 1)]
+      @posts = [mock_model(Post, :approved_comments_count => 1, :updated_at => Time.utc(2009,1,1))]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -52,7 +52,7 @@ describe PostsController do
 
   describe 'handling GET to index with tag'do
     before(:each) do
-      @posts = [mock_model(Post, :approved_comments_count => 1)]
+      @posts = [mock_model(Post, :approved_comments_count => 1, :updated_at => Time.utc(2009,1,1))]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -91,7 +91,7 @@ describe PostsController do
 
   describe 'handling GET to /posts.atom'do
     before(:each) do
-      @posts = [mock_model(Post, :approved_comments_count => 1)]
+      @posts = [mock_model(Post, :approved_comments_count => 1, :updated_at => Time.utc(2009,1,1))]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -111,7 +111,7 @@ describe PostsController do
 
   describe 'handling GET to /posts.atom with tag'do
     before(:each) do
-      @posts = [mock_model(Post, :approved_comments_count => 1)]
+      @posts = [mock_model(Post, :approved_comments_count => 1, :updated_at => Time.utc(2009,1,1))]
       Post.stub!(:find_recent).and_return(@posts)
     end
 
@@ -131,15 +131,15 @@ describe PostsController do
 
   describe "handling GET for a single post" do
     before(:each) do
-      @post = mock_model(Post, :updated_at => "2009-01-01".to_date.to_time, :approved_comments_count => 1)
-      @comment = mock_model(Post)
+      @post = mock_model(Post, :updated_at => Time.utc(2009,1,1), :approved_comments_count => 1)
+      @comment = mock_model(Comment)
       Post.stub!(:find_by_permalink).and_return(@post)
       Comment.stub!(:new).and_return(@comment)
     end
     
     after(:each) do
       response.headers["Cache-Control"].should == "public"
-      response.headers["ETag"].should == '"7f728651b8e24857cfce817ed260464c"'
+      response.headers["ETag"].should == '"e872d1baf47e47e3278d3e114e192806"'
     end
 
     def do_get
