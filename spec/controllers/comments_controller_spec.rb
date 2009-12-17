@@ -53,6 +53,7 @@ describe CommentsController, 'handling commenting' do
     }.each_pair do |attribute, value|
       @mock_post.stub!(attribute).and_return(value)
     end
+    @mock_post.stub!(:update_attribute)
     Post.stub!(:find_by_permalink).and_return(@mock_post)
     @mock_post
   end

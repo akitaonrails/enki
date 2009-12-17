@@ -13,7 +13,7 @@ class PostsController < ApplicationController
 
   def show
     @post = Post.find_by_permalink(*([:year, :month, :day, :slug].collect {|x| params[x] } << {:include => [:approved_comments, :tags]}))
-    fresh_when :etag => @post.updated_at.to_i + @post.approved_comments_count, :public => true
+    fresh_when :etag => @post.updated_at.to_i, :public => true
     @comment = Comment.new
   end
   

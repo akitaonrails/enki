@@ -139,7 +139,7 @@ describe PostsController do
     
     after(:each) do
       response.headers["Cache-Control"].should == "public"
-      response.headers["ETag"].should == '"e872d1baf47e47e3278d3e114e192806"'
+      response.headers["ETag"].should == '"4b87bd706071fca61acdff007a79742e"'
     end
 
     def do_get
