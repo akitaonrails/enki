@@ -1,9 +1,22 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe PagesController do
+  
+  describe 'cacheable posts list', :shared => true do
+    it "should setup cache control to public" do
+      do_get
+      response.headers["Cache-Control"].should == "public"
+    end
+
+    it "should setup ETag" do
+      do_get
+      response.headers["ETag"].should == '"4b87bd706071fca61acdff007a79742e"'
+    end
+  end
+  
   describe 'handling GET for a single post' do
     before(:each) do
-      @page = mock_model(Page)
+      @page = mock_model(Page, :updated_at => Time.utc(2009,1,1))
       Page.stub!(:find_by_slug).and_return(@page)
     end
 
@@ -30,6 +43,9 @@ describe PagesController do
       do_get
       assigns[:page].should equal(@page)
     end
+    
+    it_should_behave_like('cacheable posts list')
+    
   end
 
   describe 'handling GET with invalid page' do
